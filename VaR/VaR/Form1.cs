@@ -24,6 +24,30 @@ namespace VaR
             dataGridView1.DataSource = Ticks;
 
             CreatePortfolio();
+
+            List<decimal> Nyereségek = new List<decimal>();
+            
+            int intervalum = 30;
+            DateTime kezdőDátum = (from x in Ticks select x.TradingDay).Min();
+            DateTime záróDátum = dateTimePicker1.Value;
+
+            TimeSpan z = záróDátum - kezdőDátum;
+
+            for (int i = 0; i < z.Days - intervalum; i++)
+            {
+                DateTime ablakZáró = kezdőDátum.AddDays(i + intervalum);
+                DateTime ablakNyitó = kezdőDátum.AddDays(i);
+                decimal ny = GetPortfolioValue(ablakZáró)
+                           - GetPortfolioValue(ablakNyitó);
+                Nyereségek.Add(ny);
+                Console.WriteLine(i + " " + ny);
+            }
+
+            var nyereségekRendezve = (from x in Nyereségek
+                                      orderby x
+                                      select x)
+                                        .ToList();
+            MessageBox.Show(nyereségekRendezve[nyereségekRendezve.Count() / 5].ToString());
         }
 
         private void CreatePortfolio()
